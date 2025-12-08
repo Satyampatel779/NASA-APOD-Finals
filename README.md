@@ -41,6 +41,33 @@ python src/apod_pipeline.py --start-date 2024-10-01 --days 45 --database apod.db
 - `--api-key` overrides the environment/default key.
 - `--max-retries` and `--retry-wait` control basic retry behavior for rate limiting or transient errors.
 
+## Data quality
+- Run automated checks and emit reports to `data/`:
+  ```bash
+  python src/data_quality.py --database data/apod.db --report-json data/data_quality_report.json --report-md data/data_quality_report.md
+  ```
+- Checks: missing required fields (`date`, `title`, `media_type`, `url`), invalid/out-of-range dates, duplicate dates, invalid media types, and empty strings. Reports are generated in both JSON and Markdown.
+
+## Analysis notebook
+- Explore EDA and visualizations in `docs/apod_eda.ipynb` (word frequencies, media mix over time, weekday patterns, copyright distribution).
+- Open in VS Code or Jupyter after ensuring `data/apod.db` exists.
+
+## Database schema
+Table `apod_entries`:
+
+- `date` TEXT PRIMARY KEY
+- `title` TEXT NOT NULL
+- `explanation` TEXT
+- `media_type` TEXT
+- `url` TEXT
+- `hdurl` TEXT
+- `thumbnail_url` TEXT
+- `service_version` TEXT
+- `copyright` TEXT
+- `fetched_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+Index: `idx_apod_media_type` on `media_type`.
+
 ## What it does
 - Calls the APOD API with a date range to stay within rate limits while collecting multiple days at once.
 - Requests thumbnails for video entries so media is always represented.
@@ -49,3 +76,4 @@ python src/apod_pipeline.py --start-date 2024-10-01 --days 45 --database apod.db
 ## Notes
 - The pipeline stores APOD metadata; if you want images locally you can extend the script to download the `url`/`hdurl` fields.
 - The database defaults to `apod.db` in the repository root, but you can point to any writable path.
+- Unit tests live in `tests/`; run `pytest` to execute the suite.
