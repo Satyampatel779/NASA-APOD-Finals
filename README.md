@@ -15,6 +15,45 @@ Python pipeline to collect at least 30 days of NASA Astronomy Picture of the Day
    ```
    The script will default to the provided course key if the environment variable is not set.
 
+## Step-by-step guide to run the project
+1) Fetch APOD data into SQLite (30 days by default):
+   ```bash
+   python src/apod_pipeline.py --database data/apod.db
+   ```
+   - Customize range: `--start-date YYYY-MM-DD --end-date YYYY-MM-DD` or `--days N`.
+
+2) Run data quality checks (outputs JSON + Markdown reports in `data/`):
+   ```bash
+   python src/data_quality.py --database data/apod.db --report-json data/data_quality_report.json --report-md data/data_quality_report.md
+   ```
+
+3) Explore analysis and charts (EDA notebook):
+   - Open `docs/apod_eda.ipynb` in VS Code/Jupyter.
+   - Notebook visualizes word frequencies, media mix over time, weekday patterns, and copyright distribution.
+
+4) Browse data in a simple web UI (bonus):
+   ```bash
+   python src/web_app.py
+   # visit http://127.0.0.1:5000
+   ```
+   - Filter by date range and media type; sentiment scores (VADER) are shown per explanation.
+
+5) Optional extra NASA endpoint (Mars Rover Photos):
+   ```bash
+   python src/mars_photos.py --date 2025-12-08 --output data/mars_photos.json
+   ```
+
+6) Run tests:
+   ```bash
+   pytest -q
+   ```
+
+7) (Optional) Schedule daily collection (Windows Task Scheduler example):
+   - Create a Basic Task → Trigger daily → Action: `Start a program`
+   - Program/script: `C:\\Program Files\\Python314\\python.exe`
+   - Add arguments: `d:/Study/SENG8081/NASA-APOD-Finals/src/apod_pipeline.py --database d:/Study/SENG8081/NASA-APOD-Finals/data/apod.db`
+   - Ensure `NASA_API_KEY` is set in the task's environment or passed with `--api-key`.
+
 ## Usage
 
 Fetch the latest 30 days into a local database (created if missing):
@@ -51,6 +90,12 @@ python src/apod_pipeline.py --start-date 2024-10-01 --days 45 --database apod.db
 ## Analysis notebook
 - Explore EDA and visualizations in `docs/apod_eda.ipynb` (word frequencies, media mix over time, weekday patterns, copyright distribution).
 - Open in VS Code or Jupyter after ensuring `data/apod.db` exists.
+
+## Bonus features implemented
+- Simple Flask web interface (`src/web_app.py`) to browse APOD entries with filters and on-the-fly sentiment (VADER) for explanations.
+- NLP sentiment analysis via VADER; visible in the web UI and available for further analysis in notebooks.
+- Mars Rover Photos integration (`src/mars_photos.py`) to pull another NASA endpoint into `data/mars_photos.json`.
+- Scheduling guidance for automated daily collection via Windows Task Scheduler.
 
 ## Database schema
 Table `apod_entries`:
