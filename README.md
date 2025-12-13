@@ -1,8 +1,8 @@
 # NASA APOD Data Pipeline
 
-I built this project to collect, validate, analyze, and visualize NASA Astronomy Picture of the Day (APOD) data locally in SQLite. Everything runs offline once the API calls finish, so professor you can review the workflow end to end without cloud services.
+I built this project to collect, validate, analyze, and visualize NASA Astronomy Picture of the Day (APOD) data locally in SQLite. After the API calls finish, everything important runs offline from a single database file, so it is easy to review and grade end-to-end.
 
-## Quick start (Windows PowerShell examples)
+## Quick start (Windows PowerShell)
 ```pwsh
 # 1) Install deps
 python -m pip install -r requirements.txt
@@ -34,7 +34,7 @@ pytest -q
 ## What each piece does
 - `src/apod_pipeline.py`: Fetch APOD entries for a date range and upsert into SQLite with retries and thumbnails.
 - `src/data_quality.py`: Check missing fields, invalid/out-of-range dates, duplicates, media-type issues, and empty strings; outputs JSON/Markdown reports in `data/`.
-- `docs/apod_eda.ipynb`: EDA notebook (word frequency, media mix, weekday patterns, copyright).
+- `docs/apod_eda.ipynb`: EDA notebook (quality summary + media mix + posting patterns + text/HD visuals).
 - `docs/generate_plots.py`: Produces PNGs in `docs/` (`media_by_date.png`, `weekday_distribution.png`, `word_frequency.png`).
 - `src/nlp_analysis.py`: NLP on explanations—sentiment via VADER (shown in the UI) and entities/keyphrases via spaCy; falls back to regex heuristics if the spaCy model is unavailable.
 - `src/web_app.py`: Flask UI to browse APOD entries with filters and inline sentiment scores.
@@ -42,20 +42,20 @@ pytest -q
 - `run_all.py`: Orchestrator to run fetch → quality → (optional Mars) → tests in one go.
 
 ## Installation notes
-- Python 3.10+ recommended. This repo has been exercised with Python 3.14; spaCy may emit warnings on that version, so `src/nlp_analysis.py` includes a regex fallback.
+- Python 3.10+ recommended. This repo has been exercised with Python 3.14; spaCy can be sensitive to Python/model versions, so `src/nlp_analysis.py` includes a regex fallback.
 - Install deps: `python -m pip install -r requirements.txt`
 - If you want full spaCy entities, install the model: `python -m spacy download en_core_web_sm` (optional; fallback is automatic if it fails).
 
 ## Running the pipeline (detailed)
 1) Fetch data
-   ```bash
+   ```pwsh
    python src/apod_pipeline.py --database data/apod.db --days 30
    # or set explicit dates:
    python src/apod_pipeline.py --start-date 2024-11-01 --end-date 2024-11-30 --database data/apod.db
    ```
 
 2) Data quality
-   ```bash
+   ```pwsh
    python src/data_quality.py --database data/apod.db --report-json data/data_quality_report.json --report-md data/data_quality_report.md
    ```
 
@@ -64,27 +64,27 @@ pytest -q
    - Static PNGs: `python docs/generate_plots.py` (writes to `docs/`).
 
 4) NLP
-   ```bash
+   ```pwsh
    python src/nlp_analysis.py --database data/apod.db --model en_core_web_sm --top 25
    ```
    Outputs: `data/nlp_entities.json`, `data/nlp_keyphrases.json`. If the model is missing or incompatible, the script falls back to regex-based extraction.
 
 5) Web UI
-   ```bash
+   ```pwsh
    python src/web_app.py
    # then open http://127.0.0.1:5000
    ```
    Filter by date and media type; sentiment (VADER) is shown per explanation.
 
 6) Mars Rover bonus
-   ```bash
+   ```pwsh
    python src/mars_photos.py --rover perseverance --date 2022-02-18 --output data/mars_photos.json
    # or use sol instead of date:
    python src/mars_photos.py --rover curiosity --sol 1000 --output data/mars_photos.json
    ```
 
 7) Tests
-   ```bash
+   ```pwsh
    pytest -q
    ```
 

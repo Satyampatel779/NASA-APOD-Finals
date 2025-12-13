@@ -1,3 +1,17 @@
+"""Data quality checks for the APOD SQLite table.
+
+This script reads the `apod_entries` table and produces a small report that answers
+simple questions like:
+- Are any required fields missing?
+- Do any dates look invalid or out of range?
+- Did duplicate days sneak in?
+- Are there unexpected media_type values?
+
+Outputs:
+- A JSON report (easy for programs to read)
+- A Markdown report (easy for humans to read)
+"""
+
 import argparse
 import datetime as dt
 import json
@@ -118,7 +132,9 @@ def save_markdown(report: Dict[str, any], md_path: Path) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run APOD data quality checks.")
+    parser = argparse.ArgumentParser(
+        description="Run data quality checks on the APOD SQLite table and write JSON/Markdown reports."
+    )
     parser.add_argument("--database", default="data/apod.db", help="Path to SQLite database.")
     parser.add_argument("--report-json", default="data/data_quality_report.json", help="Path to JSON report output.")
     parser.add_argument("--report-md", default="data/data_quality_report.md", help="Path to Markdown summary.")

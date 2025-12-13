@@ -1,3 +1,14 @@
+"""APOD ingestion pipeline.
+
+This script downloads NASA Astronomy Picture of the Day (APOD) entries for a date range
+and stores them in a local SQLite database.
+
+Notes:
+- "SQLite" is a single-file database (here: `data/apod.db`).
+- "Upsert" means: insert a new row, or update the existing row if that date already exists.
+- The NASA API can rate-limit requests; this script retries on common transient failures.
+"""
+
 import argparse
 import datetime as dt
 import logging
@@ -189,7 +200,12 @@ def main() -> None:
         format="%(asctime)s %(levelname)s %(name)s - %(message)s",
     )
 
-    parser = argparse.ArgumentParser(description="Fetch NASA APOD entries into SQLite.")
+    parser = argparse.ArgumentParser(
+        description=(
+            "Fetch NASA APOD entries for a date range and upsert them into a SQLite database. "
+            "Defaults to the most recent 30 days if no dates are provided."
+        )
+    )
     parser.add_argument(
         "--days",
         type=int,
@@ -206,7 +222,7 @@ def main() -> None:
     parser.add_argument(
         "--api-key",
         default=DEFAULT_API_KEY,
-        help="NASA API key. Defaults to NASA_API_KEY env var or provided course key.",
+        help="NASA API key. Defaults to env var NASA_API_KEY (falls back to DEMO_KEY if not set).",
     )
     parser.add_argument("--max-retries", type=int, default=3, help="Retry attempts on transient failures.")
     parser.add_argument("--retry-wait", type=int, default=5, help="Seconds to wait between retries.")

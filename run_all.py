@@ -1,9 +1,13 @@
 #!/usr/bin/env python
-"""Simple orchestrator to run the main project steps sequentially.
-- Fetch APOD data into SQLite
-- Run data quality checks (JSON/MD)
-- (Optional) Fetch Mars photos sample
-- Run pytest
+"""Run the main project steps in one go.
+
+This script is a convenience runner. It executes:
+1) APOD fetch into SQLite
+2) Data quality reports (JSON + Markdown)
+3) Optional Mars photos sample
+4) Pytest
+
+It stops on the first failure so it is easy to see what broke.
 """
 
 import argparse
@@ -30,7 +34,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run NASA APOD pipeline steps sequentially.")
     parser.add_argument("--database", default=str(ROOT / "data" / "apod.db"), help="SQLite database path")
     parser.add_argument(
-        "--skip-mars", action="store_true", help="Skip optional Mars photos fetch step (avoids empty results if no photos that day)."
+        "--skip-mars",
+        action="store_true",
+        help="Skip the optional Mars photos step (useful if a chosen day has no photos).",
     )
     parser.add_argument(
         "--mars-date", default=None, help="Earth date YYYY-MM-DD for Mars photos (optional; overrides --mars-sol)."

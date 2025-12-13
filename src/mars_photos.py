@@ -1,3 +1,14 @@
+"""Fetch a small sample of NASA Mars Rover photos.
+
+This is an optional "bonus" script in the project. It calls NASA's Mars Rover Photos API
+for a given rover and either an Earth date or a Martian sol, then writes a compact JSON
+file to disk.
+
+Important behavior:
+- If the API returns 404 for a date/sol (no photos), the script returns an empty list
+    instead of crashing.
+"""
+
 import argparse
 import datetime as dt
 import json
@@ -50,9 +61,9 @@ def fetch_mars_photos(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Fetch Mars rover photos for a given Earth date or sol.")
-    parser.add_argument("--date", help="Earth date YYYY-MM-DD (optional if --sol is set)")
-    parser.add_argument("--sol", type=int, help="Martian sol (mission day) integer")
+    parser = argparse.ArgumentParser(description="Fetch Mars rover photos for a given Earth date or sol and save JSON.")
+    parser.add_argument("--date", help="Earth date YYYY-MM-DD (optional if --sol is provided)")
+    parser.add_argument("--sol", type=int, help="Martian sol (mission day).")
     parser.add_argument("--rover", default=DEFAULT_ROVER, help="Rover name: curiosity|opportunity|spirit|perseverance")
     parser.add_argument("--api-key", default=DEFAULT_API_KEY, help="NASA API key")
     parser.add_argument("--output", default="data/mars_photos.json", help="Output JSON path")

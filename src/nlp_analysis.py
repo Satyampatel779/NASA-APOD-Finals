@@ -1,3 +1,16 @@
+"""NLP analysis for APOD explanations.
+
+This script reads `date`, `title`, and `explanation` from the `apod_entries` table and
+produces two small JSON files:
+
+- `data/nlp_entities.json`: most common detected "entities"
+- `data/nlp_keyphrases.json`: most common keyphrase-style terms
+
+If spaCy is available, the script uses spaCy's NER and noun chunks.
+If spaCy cannot be imported or the model cannot be loaded, the script falls back to
+simple regex heuristics so the project still runs in a limited environment.
+"""
+
 import argparse
 import json
 import re
@@ -75,7 +88,9 @@ def save_top(counter: Counter, top_n: int, path: Path, label: str) -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run NLP analysis on APOD explanations (entities + keyphrases).")
+    parser = argparse.ArgumentParser(
+        description="Analyze APOD explanation text and write top entities/keyphrases to JSON (spaCy optional; regex fallback)."
+    )
     parser.add_argument("--database", default=str(DB_PATH), help="Path to SQLite database")
     parser.add_argument("--model", default="en_core_web_sm", help="spaCy model name")
     parser.add_argument("--top", type=int, default=25, help="Top N items to keep")

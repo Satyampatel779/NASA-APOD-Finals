@@ -1,3 +1,14 @@
+"""Generate a few static PNG charts from the APOD SQLite database.
+
+This script is optional. It produces the same core visuals as the notebook, but writes
+them to `docs/` as image files so they can be viewed without opening Jupyter.
+
+Outputs:
+- `docs/media_by_date.png`
+- `docs/weekday_distribution.png`
+- `docs/word_frequency.png`
+"""
+
 import sqlite3
 from pathlib import Path
 import re
@@ -24,7 +35,7 @@ def load_data() -> pd.DataFrame:
     return df.dropna(subset=["date_dt"])
 
 
-def plot_media_over_time(df: pd.DataFrame):
+def plot_media_over_time(df: pd.DataFrame) -> None:
     media_by_date = df.groupby("date_dt")["media_type"].value_counts().unstack(fill_value=0)
     media_by_date.sort_index(inplace=True)
     ax = media_by_date.plot(kind="bar", stacked=True, figsize=(12, 4), color=["#4c72b0", "#dd8452", "#55a868"])
@@ -37,7 +48,7 @@ def plot_media_over_time(df: pd.DataFrame):
     plt.close()
 
 
-def plot_weekday_distribution(df: pd.DataFrame):
+def plot_weekday_distribution(df: pd.DataFrame) -> None:
     order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     counts = df["weekday"].value_counts().reindex(order, fill_value=0)
     plt.figure(figsize=(7, 4))
@@ -51,7 +62,7 @@ def plot_weekday_distribution(df: pd.DataFrame):
     plt.close()
 
 
-def plot_top_words(df: pd.DataFrame):
+def plot_top_words(df: pd.DataFrame) -> None:
     def extract_words(text: str) -> list[str]:
         return re.findall(r"[A-Za-z]{4,}", text.lower()) if isinstance(text, str) else []
 
@@ -68,7 +79,7 @@ def plot_top_words(df: pd.DataFrame):
     plt.close()
 
 
-def main():
+def main() -> None:
     df = load_data()
     plot_media_over_time(df)
     plot_weekday_distribution(df)

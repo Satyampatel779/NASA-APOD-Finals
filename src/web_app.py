@@ -1,5 +1,12 @@
 from __future__ import annotations
 
+"""Minimal Flask UI for browsing APOD entries.
+
+This is intentionally simple: it reads rows from `data/apod.db`, lets a reviewer filter
+by date range and media type, and shows a quick VADER sentiment score for each
+explanation.
+"""
+
 import sqlite3
 from pathlib import Path
 from typing import Any, Dict, List
@@ -18,14 +25,13 @@ PAGE = """
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>NASA APOD Browser</title>
+  <title>APOD Browser (Local)</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 1.5rem; }
     header { margin-bottom: 1rem; }
     .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
     .meta { color: #555; font-size: 0.9rem; }
     .title { font-weight: 600; }
-    .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 6px; background: #eef; margin-left: 0.5rem; }
     .sent { font-size: 0.85rem; color: #333; }
     form { margin-bottom: 1rem; }
     input, select { padding: 0.35rem; }
@@ -33,7 +39,8 @@ PAGE = """
 </head>
 <body>
 <header>
-  <h1>NASA APOD Browser</h1>
+  <h1>NASA APOD Browser (Local Database)</h1>
+  <p class="meta">This page reads from <code>data/apod.db</code> and shows up to the latest 100 matching entries.</p>
   <form method="get">
     <label>Date range: <input type="date" name="start" value="{{ start }}"> to <input type="date" name="end" value="{{ end }}"></label>
     <label>Media: 
@@ -52,8 +59,8 @@ PAGE = """
     <div class="meta">{{ row['date'] }} • {{ row['media_type'] }}{% if row['copyright'] %} • © {{ row['copyright'] }}{% endif %}</div>
     <div class="title">{{ row['title'] }}</div>
     <p>{{ row['explanation'][:240] }}{% if row['explanation'] and row['explanation']|length > 240 %}...{% endif %}</p>
-    {% if row['url'] %}<div><a href="{{ row['url'] }}" target="_blank">Open media</a></div>{% endif %}
-    <div class="sent">Sentiment (compound): {{ "%.3f"|format(row['sentiment']) }}</div>
+    {% if row['url'] %}<div><a href="{{ row['url'] }}" target="_blank" rel="noreferrer">Open media</a></div>{% endif %}
+    <div class="sent">Sentiment (VADER, compound): {{ "%.3f"|format(row['sentiment']) }}</div>
   </div>
   {% endfor %}
   {% if not rows %}<p>No entries found for the selected filters.</p>{% endif %}
