@@ -1,14 +1,16 @@
 # NASA APOD Data Pipeline
 
-I built this project to collect, validate, analyze, and visualize NASA Astronomy Picture of the Day (APOD) data locally in SQLite. Everything runs offline once the API calls finish, so a student or professor can review the workflow end to end without cloud services.
+I built this project to collect, validate, analyze, and visualize NASA Astronomy Picture of the Day (APOD) data locally in SQLite. Everything runs offline once the API calls finish, so professor you can review the workflow end to end without cloud services.
 
 ## Quick start (Windows PowerShell examples)
 ```pwsh
 # 1) Install deps
 python -m pip install -r requirements.txt
 
-# 2) Set your API key (replace with your own)
+# 2) Set your API key (replace with your own) or create a .env file
 $env:NASA_API_KEY="<your_key>"
+# alternatively: create a .env file at the repo root with
+# NASA_API_KEY=<your_key>
 
 # 3) Run the main pipeline (30 days by default)
 python src/apod_pipeline.py --database data/apod.db

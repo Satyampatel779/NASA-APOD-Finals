@@ -1,15 +1,16 @@
 import argparse
 import datetime as dt
 import logging
-import os
 import sqlite3
 import time
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import requests
 
+from src.config import get_env
+
 API_URL = "https://api.nasa.gov/planetary/apod"
-DEFAULT_API_KEY = os.getenv("NASA_API_KEY") or "1r44g8KrnaLuckayDcinAftBK4LRR9C4Di7zG2za"
+DEFAULT_API_KEY = get_env("NASA_API_KEY", "DEMO_KEY")
 logger = logging.getLogger(__name__)
 
 

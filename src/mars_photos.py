@@ -6,7 +6,9 @@ from typing import Any, Dict, List
 
 import requests
 
-DEFAULT_API_KEY = "1r44g8KrnaLuckayDcinAftBK4LRR9C4Di7zG2za"
+from src.config import get_env
+
+DEFAULT_API_KEY = get_env("NASA_API_KEY", "DEMO_KEY")
 DEFAULT_ROVER = "curiosity"
 
 
