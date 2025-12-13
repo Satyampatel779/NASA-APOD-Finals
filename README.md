@@ -31,24 +31,31 @@ Python pipeline to collect at least 30 days of NASA Astronomy Picture of the Day
    - Open `docs/apod_eda.ipynb` in VS Code/Jupyter.
    - Notebook visualizes word frequencies, media mix over time, weekday patterns, and copyright distribution.
 
-4) Browse data in a simple web UI (bonus):
+4) NLP (sentiment + entities/keyphrases):
+   - Sentiment appears in the web UI (VADER). For entities/keyphrases run:
+   ```bash
+   python src/nlp_analysis.py --database data/apod.db --model en_core_web_sm --top 25
+   ```
+   - Outputs: `data/nlp_entities.json` and `data/nlp_keyphrases.json`. If the model is missing, install: `python -m spacy download en_core_web_sm`. If spaCy/model is unavailable, the script falls back to lightweight regex-based entities/keyphrases.
+
+5) Browse data in a simple web UI (bonus):
    ```bash
    python src/web_app.py
    # visit http://127.0.0.1:5000
    ```
    - Filter by date range and media type; sentiment scores (VADER) are shown per explanation.
 
-5) Optional extra NASA endpoint (Mars Rover Photos):
+6) Optional extra NASA endpoint (Mars Rover Photos):
    ```bash
    python src/mars_photos.py --date 2025-12-08 --output data/mars_photos.json
    ```
 
-6) Run tests:
+7) Run tests:
    ```bash
    pytest -q
    ```
 
-7) (Optional) Schedule daily collection (Windows Task Scheduler example):
+8) (Optional) Schedule daily collection (Windows Task Scheduler example):
    - Create a Basic Task → Trigger daily → Action: `Start a program`
    - Program/script: `C:\\Program Files\\Python314\\python.exe`
    - Add arguments: `d:/Study/SENG8081/NASA-APOD-Finals/src/apod_pipeline.py --database d:/Study/SENG8081/NASA-APOD-Finals/data/apod.db`
@@ -93,7 +100,7 @@ python src/apod_pipeline.py --start-date 2024-10-01 --days 45 --database apod.db
 
 ## Bonus features implemented
 - Simple Flask web interface (`src/web_app.py`) to browse APOD entries with filters and on-the-fly sentiment (VADER) for explanations.
-- NLP sentiment analysis via VADER; visible in the web UI and available for further analysis in notebooks.
+- NLP: sentiment via VADER in the UI; entities/keyphrases via spaCy (`src/nlp_analysis.py`, outputs JSON files in `data/`).
 - Mars Rover Photos integration (`src/mars_photos.py`) to pull another NASA endpoint into `data/mars_photos.json`.
 - Scheduling guidance for automated daily collection via Windows Task Scheduler.
 

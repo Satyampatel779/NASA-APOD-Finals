@@ -1,0 +1,14 @@
+Table: apod_entries
+- date TEXT PRIMARY KEY
+- title TEXT NOT NULL
+- explanation TEXT
+- media_type TEXT
+- url TEXT
+- hdurl TEXT
+- thumbnail_url TEXT
+- service_version TEXT
+- copyright TEXT
+- fetched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+Index:
+- idx_apod_media_type ON apod_entries(media_type)
