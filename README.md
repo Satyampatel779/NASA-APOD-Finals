@@ -1,112 +1,106 @@
 # NASA APOD Data Pipeline
 
-Python pipeline to collect at least 30 days of NASA Astronomy Picture of the Day (APOD) metadata and store it locally in SQLite for analysis.
+I built this project to collect, validate, analyze, and visualize NASA Astronomy Picture of the Day (APOD) data locally in SQLite. Everything runs offline once the API calls finish, so a student or professor can review the workflow end to end without cloud services.
 
-## Setup
+## Quick start (Windows PowerShell examples)
+```pwsh
+# 1) Install deps
+python -m pip install -r requirements.txt
 
-1. Install Python 3.10+.
-2. Install dependencies:
+# 2) Set your API key (replace with your own)
+$env:NASA_API_KEY="<your_key>"
+
+# 3) Run the main pipeline (30 days by default)
+python src/apod_pipeline.py --database data/apod.db
+
+# 4) Run quality checks
+python src/data_quality.py --database data/apod.db --report-json data/data_quality_report.json --report-md data/data_quality_report.md
+
+# 5) Generate plots (PNG in docs/)
+python docs/generate_plots.py
+
+# 6) NLP entities/keyphrases (fallback to regex if spaCy model missing)
+python src/nlp_analysis.py --database data/apod.db --model en_core_web_sm --top 25
+
+# 7) Launch the web UI
+python src/web_app.py   # open http://127.0.0.1:5000
+
+# 8) Run tests
+pytest -q
+```
+
+## What each piece does
+- `src/apod_pipeline.py`: Fetch APOD entries for a date range and upsert into SQLite with retries and thumbnails.
+- `src/data_quality.py`: Check missing fields, invalid/out-of-range dates, duplicates, media-type issues, and empty strings; outputs JSON/Markdown reports in `data/`.
+- `docs/apod_eda.ipynb`: EDA notebook (word frequency, media mix, weekday patterns, copyright).
+- `docs/generate_plots.py`: Produces PNGs in `docs/` (`media_by_date.png`, `weekday_distribution.png`, `word_frequency.png`).
+- `src/nlp_analysis.py`: NLP on explanations—sentiment via VADER (shown in the UI) and entities/keyphrases via spaCy; falls back to regex heuristics if the spaCy model is unavailable.
+- `src/web_app.py`: Flask UI to browse APOD entries with filters and inline sentiment scores.
+- `src/mars_photos.py`: Bonus script to fetch Mars Rover photos by Earth date or sol; saves JSON in `data/`.
+- `run_all.py`: Orchestrator to run fetch → quality → (optional Mars) → tests in one go.
+
+## Installation notes
+- Python 3.10+ recommended. This repo has been exercised with Python 3.14; spaCy may emit warnings on that version, so `src/nlp_analysis.py` includes a regex fallback.
+- Install deps: `python -m pip install -r requirements.txt`
+- If you want full spaCy entities, install the model: `python -m spacy download en_core_web_sm` (optional; fallback is automatic if it fails).
+
+## Running the pipeline (detailed)
+1) Fetch data
    ```bash
-   pip install -r requirements.txt
+   python src/apod_pipeline.py --database data/apod.db --days 30
+   # or set explicit dates:
+   python src/apod_pipeline.py --start-date 2024-11-01 --end-date 2024-11-30 --database data/apod.db
    ```
-3. Provide an API key (recommended via environment):
-   ```bash
-   $env:NASA_API_KEY="<your_key>"
-   ```
-   The script will default to the provided course key if the environment variable is not set.
 
-## Step-by-step guide to run the project
-1) Fetch APOD data into SQLite (30 days by default):
-   ```bash
-   python src/apod_pipeline.py --database data/apod.db
-   ```
-   - Customize range: `--start-date YYYY-MM-DD --end-date YYYY-MM-DD` or `--days N`.
-
-2) Run data quality checks (outputs JSON + Markdown reports in `data/`):
+2) Data quality
    ```bash
    python src/data_quality.py --database data/apod.db --report-json data/data_quality_report.json --report-md data/data_quality_report.md
    ```
 
-3) Explore analysis and charts (EDA notebook):
-   - Open `docs/apod_eda.ipynb` in VS Code/Jupyter.
-   - Notebook visualizes word frequencies, media mix over time, weekday patterns, and copyright distribution.
+3) Analysis / visualization
+   - Notebook: open `docs/apod_eda.ipynb` in VS Code/Jupyter (requires `data/apod.db`).
+   - Static PNGs: `python docs/generate_plots.py` (writes to `docs/`).
 
-4) NLP (sentiment + entities/keyphrases):
-   - Sentiment appears in the web UI (VADER). For entities/keyphrases run:
+4) NLP
    ```bash
    python src/nlp_analysis.py --database data/apod.db --model en_core_web_sm --top 25
    ```
-   - Outputs: `data/nlp_entities.json` and `data/nlp_keyphrases.json`. If the model is missing, install: `python -m spacy download en_core_web_sm`. If spaCy/model is unavailable, the script falls back to lightweight regex-based entities/keyphrases.
+   Outputs: `data/nlp_entities.json`, `data/nlp_keyphrases.json`. If the model is missing or incompatible, the script falls back to regex-based extraction.
 
-5) Browse data in a simple web UI (bonus):
+5) Web UI
    ```bash
    python src/web_app.py
-   # visit http://127.0.0.1:5000
+   # then open http://127.0.0.1:5000
    ```
-   - Filter by date range and media type; sentiment scores (VADER) are shown per explanation.
+   Filter by date and media type; sentiment (VADER) is shown per explanation.
 
-6) Optional extra NASA endpoint (Mars Rover Photos):
+6) Mars Rover bonus
    ```bash
-   python src/mars_photos.py --date 2025-12-08 --output data/mars_photos.json
+   python src/mars_photos.py --rover perseverance --date 2022-02-18 --output data/mars_photos.json
+   # or use sol instead of date:
+   python src/mars_photos.py --rover curiosity --sol 1000 --output data/mars_photos.json
    ```
 
-7) Run tests:
+7) Tests
    ```bash
    pytest -q
    ```
 
-8) (Optional) Schedule daily collection (Windows Task Scheduler example):
-   - Create a Basic Task → Trigger daily → Action: `Start a program`
-   - Program/script: `C:\\Program Files\\Python314\\python.exe`
-   - Add arguments: `d:/Study/SENG8081/NASA-APOD-Finals/src/apod_pipeline.py --database d:/Study/SENG8081/NASA-APOD-Finals/data/apod.db`
-   - Ensure `NASA_API_KEY` is set in the task's environment or passed with `--api-key`.
+8) Scheduling (optional, Windows Task Scheduler)
+   - Program: `C:\Program Files\Python314\python.exe`
+   - Args: `d:/Study/SENG8081/NASA-APOD-Finals/src/apod_pipeline.py --database d:/Study/SENG8081/NASA-APOD-Finals/data/apod.db`
+   - Ensure `NASA_API_KEY` is set in the task or pass `--api-key <key>`.
 
-## Usage
+## Data artifacts
+- `data/apod.db`: SQLite database with APOD metadata.
+- `data/data_quality_report.json|md`: Quality summaries.
+- `data/apod_entries.csv`: CSV export of the APOD table.
+- `docs/media_by_date.png`, `weekday_distribution.png`, `word_frequency.png`: Generated charts.
+- `data/nlp_entities.json`, `data/nlp_keyphrases.json`: NLP outputs.
+- `data/mars_photos.json` (if you run the Mars script).
+- `data/schema.txt`: Table definition and index.
 
-Fetch the latest 30 days into a local database (created if missing):
-
-```bash
-python src/apod_pipeline.py --database apod.db
-```
-
-Custom date range:
-
-```bash
-python src/apod_pipeline.py --start-date 2024-10-01 --end-date 2024-10-31 --database apod.db
-```
-
-Or anchor a range to a start date (30 days by default):
-
-```bash
-python src/apod_pipeline.py --start-date 2024-10-01 --days 45 --database apod.db
-```
-
-### Options
-- `--days` (default 30) sets the range length when only one or no boundary is supplied.
-- `--start-date` / `--end-date` accept `YYYY-MM-DD` values.
-- `--api-key` overrides the environment/default key.
-- `--max-retries` and `--retry-wait` control basic retry behavior for rate limiting or transient errors.
-
-## Data quality
-- Run automated checks and emit reports to `data/`:
-  ```bash
-  python src/data_quality.py --database data/apod.db --report-json data/data_quality_report.json --report-md data/data_quality_report.md
-  ```
-- Checks: missing required fields (`date`, `title`, `media_type`, `url`), invalid/out-of-range dates, duplicate dates, invalid media types, and empty strings. Reports are generated in both JSON and Markdown.
-
-## Analysis notebook
-- Explore EDA and visualizations in `docs/apod_eda.ipynb` (word frequencies, media mix over time, weekday patterns, copyright distribution).
-- Open in VS Code or Jupyter after ensuring `data/apod.db` exists.
-
-## Bonus features implemented
-- Simple Flask web interface (`src/web_app.py`) to browse APOD entries with filters and on-the-fly sentiment (VADER) for explanations.
-- NLP: sentiment via VADER in the UI; entities/keyphrases via spaCy (`src/nlp_analysis.py`, outputs JSON files in `data/`).
-- Mars Rover Photos integration (`src/mars_photos.py`) to pull another NASA endpoint into `data/mars_photos.json`.
-- Scheduling guidance for automated daily collection via Windows Task Scheduler.
-
-## Database schema
-Table `apod_entries`:
-
+## Database schema (apod_entries)
 - `date` TEXT PRIMARY KEY
 - `title` TEXT NOT NULL
 - `explanation` TEXT
@@ -117,15 +111,15 @@ Table `apod_entries`:
 - `service_version` TEXT
 - `copyright` TEXT
 - `fetched_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-
 Index: `idx_apod_media_type` on `media_type`.
 
-## What it does
-- Calls the APOD API with a date range to stay within rate limits while collecting multiple days at once.
-- Requests thumbnails for video entries so media is always represented.
-- Creates an `apod_entries` table (if missing) and upserts records keyed by `date` with a small index on `media_type` to speed up queries.
+## Design notes
+- I request date ranges to respect API limits while reducing call volume.
+- I upsert by `date` to keep the latest metadata without duplicates.
+- I ask for video thumbnails so every record has a representative media link.
+- Quality checks guard against missing fields, bad dates, and malformed media types.
 
-## Notes
-- The pipeline stores APOD metadata; if you want images locally you can extend the script to download the `url`/`hdurl` fields.
-- The database defaults to `apod.db` in the repository root, but you can point to any writable path.
-- Unit tests live in `tests/`; run `pytest` to execute the suite.
+## Troubleshooting
+- Missing spaCy model or Python 3.14 incompatibility: the NLP script falls back to regex heuristics; install `en_core_web_sm` if you need richer entities.
+- Empty Mars photos: some dates/sols have zero results; the script now returns an empty JSON instead of failing.
+- API key: set `NASA_API_KEY` or pass `--api-key` to `apod_pipeline.py` and `mars_photos.py`.
