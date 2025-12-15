@@ -1,6 +1,6 @@
 # NASA APOD Data Pipeline
 
-I built this project to collect, validate, analyze, and visualize NASA Astronomy Picture of the Day (APOD) data locally in SQLite. After the API calls finish, everything important runs offline from a single database file, so it is easy to review and grade end-to-end.
+Professor, I built this project to collect, validate, analyze, and visualize NASA Astronomy Picture of the Day (APOD) data locally in SQLite, If we get massive, I can easily migrate this project to MongoDB atlas, I find it easier to use and visualization tools are top notch. So After the API calls finish, everything important runs offline from a single database file. 
 
 ## Quick start (Windows PowerShell)
 ```pwsh
