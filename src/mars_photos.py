@@ -1,12 +1,11 @@
-"""Fetch a small sample of NASA Mars Rover photos.
+"""This code fetches a small sample of NASA Mars Rover photos
 
-This is an optional "bonus" script in the project. It calls NASA's Mars Rover Photos API
+This is an optional bonus code. It calls NASA's Mars Rover Photos API
 for a given rover and either an Earth date or a Martian sol, then writes a compact JSON
-file to disk.
+file to the data folder.
 
-Important behavior:
-- If the API returns 404 for a date/sol (no photos), the script returns an empty list
-    instead of crashing.
+so what i did here is if the API returns 404 for a date/sol (no photos), the code returns an empty list instead of crashing. 
+took long to fix this bug 
 """
 
 import argparse

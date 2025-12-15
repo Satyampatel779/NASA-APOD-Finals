@@ -1,12 +1,11 @@
-"""APOD ingestion pipeline.
+"""
+so here what i'm doing is to download NASA Astronomy Picture of the Day (APOD) entries for a date range
+and i'm storing them in a local SQLite database.
 
-This script downloads NASA Astronomy Picture of the Day (APOD) entries for a date range
-and stores them in a local SQLite database.
-
-Notes:
+my notes:
 - "SQLite" is a single-file database (here: `data/apod.db`).
 - "Upsert" means: insert a new row, or update the existing row if that date already exists.
-- The NASA API can rate-limit requests; this script retries on common transient failures.
+- The NASA API can rate-limit requests. If I hit a rate limit, I should wait and retry.
 """
 
 import argparse

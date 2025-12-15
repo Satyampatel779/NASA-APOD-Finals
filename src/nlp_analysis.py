@@ -1,8 +1,7 @@
-"""NLP analysis for APOD explanations.
+"""NLP analysis
 
-This script reads `date`, `title`, and `explanation` from the `apod_entries` table and
-produces two small JSON files:
-
+what i did here is the code reads date, title, and explanation from the apod_entries table and
+produces two small JSON files in the data folder
 - `data/nlp_entities.json`: most common detected "entities"
 - `data/nlp_keyphrases.json`: most common keyphrase-style terms
 

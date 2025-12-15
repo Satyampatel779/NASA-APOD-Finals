@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-"""Minimal Flask UI for browsing APOD entries.
+"""i made a very minimal Flask UI for browsing APOD entries.
 
-This is intentionally simple: it reads rows from `data/apod.db`, lets a reviewer filter
+what it does, it reads rows from data/apod.db, lets a reviewer(for example: me or you) filter
 by date range and media type, and shows a quick VADER sentiment score for each
 explanation.
 """

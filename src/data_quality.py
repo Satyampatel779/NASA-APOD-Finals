@@ -1,15 +1,14 @@
-"""Data quality checks for the APOD SQLite table.
-
-This script reads the `apod_entries` table and produces a small report that answers
-simple questions like:
+"""Data quality checking here
+in this code , our script reads the apod_entries table and produces a small report that answers
+simple questions like
 - Are any required fields missing?
 - Do any dates look invalid or out of range?
 - Did duplicate days sneak in?
 - Are there unexpected media_type values?
 
-Outputs:
-- A JSON report (easy for programs to read)
-- A Markdown report (easy for humans to read)
+I get these outputs after running this code:
+- A JSON report
+- A Markdown report
 """
 
 import argparse
