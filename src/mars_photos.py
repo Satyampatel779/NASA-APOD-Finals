@@ -11,12 +11,19 @@ took long to fix this bug
 import argparse
 import datetime as dt
 import json
+import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
 import requests
 
-from src.config import get_env
+try:
+    from src.config import get_env
+except ModuleNotFoundError:
+    project_root = Path(__file__).resolve().parents[1]
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+    from src.config import get_env
 
 DEFAULT_API_KEY = get_env("NASA_API_KEY", "DEMO_KEY")
 DEFAULT_ROVER = "curiosity"

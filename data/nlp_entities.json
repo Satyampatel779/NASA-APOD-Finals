@@ -21,16 +21,28 @@
       "count": 13
     },
     {
-      "text": "Orion",
-      "count": 11
+      "text": "Solar",
+      "count": 12
     },
     {
-      "text": "Solar",
+      "text": "Orion",
       "count": 11
     },
     {
       "text": "Nebula",
       "count": 10
+    },
+    {
+      "text": "System",
+      "count": 10
+    },
+    {
+      "text": "What",
+      "count": 9
+    },
+    {
+      "text": "Jupiter",
+      "count": 9
     },
     {
       "text": "APOD",
@@ -41,16 +53,8 @@
       "count": 9
     },
     {
-      "text": "System",
-      "count": 9
-    },
-    {
       "text": "December",
       "count": 9
-    },
-    {
-      "text": "What",
-      "count": 8
     },
     {
       "text": "Galaxy",
@@ -58,10 +62,6 @@
     },
     {
       "text": "Wednesday",
-      "count": 7
-    },
-    {
-      "text": "Jupiter",
       "count": 7
     },
     {
@@ -75,6 +75,10 @@
     {
       "text": "Lemmon",
       "count": 6
+    },
+    {
+      "text": "Juno",
+      "count": 5
     },
     {
       "text": "Hubble",
@@ -95,10 +99,6 @@
     {
       "text": "Schmitt",
       "count": 5
-    },
-    {
-      "text": "Telescope",
-      "count": 4
     }
   ]
 }

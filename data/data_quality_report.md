@@ -1,6 +1,6 @@
 # APOD Data Quality Report
 
-Total rows: 35
+Total rows: 36
 
 ## Missing Required Fields
 - date: 0

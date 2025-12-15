@@ -12,12 +12,22 @@ import argparse
 import datetime as dt
 import logging
 import sqlite3
+import sys
 import time
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import requests
 
-from src.config import get_env
+try:
+    from src.config import get_env
+except ModuleNotFoundError:
+    # Support running as a script: `python src/apod_pipeline.py ...`
+    # In that case, Python's import root is `src/`, so `import src.*` fails.
+    project_root = Path(__file__).resolve().parents[1]
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+    from src.config import get_env
 
 API_URL = "https://api.nasa.gov/planetary/apod"
 DEFAULT_API_KEY = get_env("NASA_API_KEY", "DEMO_KEY")

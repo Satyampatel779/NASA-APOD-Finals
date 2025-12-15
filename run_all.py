@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Run the main project steps in one go.
 
-This script is a convenience runner. It executes:
+This code is a convenience runner. It executes:
 1) APOD fetch into SQLite
 2) Data quality reports (JSON + Markdown)
 3) Optional Mars photos sample
@@ -52,7 +52,8 @@ def main() -> None:
 
     pipeline_cmd = [
         PYTHON,
-        str(ROOT / "src" / "apod_pipeline.py"),
+        "-m",
+        "src.apod_pipeline",
         "--database",
         args.database,
     ]
@@ -62,7 +63,8 @@ def main() -> None:
 
     dq_cmd = [
         PYTHON,
-        str(ROOT / "src" / "data_quality.py"),
+        "-m",
+        "src.data_quality",
         "--database",
         args.database,
         "--report-json",
@@ -75,7 +77,8 @@ def main() -> None:
     if not args.skip_mars:
         mars_cmd = [
             PYTHON,
-            str(ROOT / "src" / "mars_photos.py"),
+            "-m",
+            "src.mars_photos",
             "--rover",
             args.mars_rover,
             "--output",
